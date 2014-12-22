@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.mycompany.server.Game;
 
-import exceptions.NotFoundException;
+import com.mycompany.server.exceptions.NotFoundException;
 
 public enum GameManager {
     INSTANCE;
@@ -25,7 +25,7 @@ public enum GameManager {
     
     public Game getGame()
     {
-        Game result = new Game();
+        Game result = new Game(generatedId);
         
         games.put(generatedId, result);
         generatedId++;

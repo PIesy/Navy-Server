@@ -1,4 +1,4 @@
-package exceptions;
+package com.mycompany.server.exceptions;
 
 public class NotFoundException extends Exception {
 
