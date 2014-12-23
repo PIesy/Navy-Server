@@ -3,8 +3,8 @@ package com.mycompany.server;
 import java.util.HashMap;
 
 import com.mycompany.server.Game;
-
 import com.mycompany.server.exceptions.NotFoundException;
+import com.mycompany.server.game.GameRules;
 
 public enum GameManager {
     INSTANCE;
@@ -25,7 +25,7 @@ public enum GameManager {
     
     public Game getGame()
     {
-        Game result = new Game(generatedId);
+        Game result = new Game(generatedId, new GameRules());
         
         games.put(generatedId, result);
         generatedId++;

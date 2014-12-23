@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import javax.json.*;
 
 import com.mycompany.server.exceptions.NotFoundException;
+import com.mycompany.server.game.GameRules;
  
 @WebServlet("/Game")
 public class GameServlet extends HttpServlet
@@ -20,12 +21,18 @@ public class GameServlet extends HttpServlet
     {
         JsonObject obj;
         HttpSession session = request.getSession(true);
-        response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_OK);
+        int gameId;
+        
+        setResponseProperties(response);
         if(session.getAttribute("game") == null){
             session.setAttribute("game", manager.getGame().getId());
         }
-        obj = Json.createObjectBuilder().add("gameId", (int)session.getAttribute("game")).build();
+        gameId = (int)session.getAttribute("game");
+        try {
+            obj = fillGameData(gameId, manager.findGame(gameId).getRules());
+        } catch (NotFoundException e) {
+            obj = Json.createObjectBuilder().build();
+        }
         response.getWriter().print(obj.toString());
     }
     
@@ -39,13 +46,14 @@ public class GameServlet extends HttpServlet
             getGameIfExists(request.getSession(), object);
             game = manager.findGame(object.getInt("gameId"));
             coordinates = game.handleInput(object);
-            responceObject = Json.createObjectBuilder().add("x", coordinates[0]).add("y", coordinates[1]).build();
+            responceObject = Json.createObjectBuilder()
+                    .add("x", coordinates[0])
+                    .add("y", coordinates[1])
+                    .build();
         } catch (NotFoundException e) {
             responceObject = Json.createObjectBuilder().add("error", e.toString()).build();
         }
-        response.setCharacterEncoding("UTF8");
-        response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_OK);
+        setResponseProperties(response);
         response.getWriter().println(responceObject.toString());
     }
     
@@ -57,9 +65,30 @@ public class GameServlet extends HttpServlet
             game = manager.findGame(object.getInt("gameId"));
             session.setAttribute("game", game.getId());
         }
-        else{
+        else {
             throw new NotFoundException("No game id provided");
         }
+    }
+    
+    private void setResponseProperties(HttpServletResponse response)
+    {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF8");
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+    
+    private JsonObject fillGameData(int gameId, GameRules properties)
+    {
+        JsonObject obj = Json.createObjectBuilder().add("gameId", gameId)
+                .add("size_x", properties.fieldDimensions[0])
+                .add("size_y", properties.fieldDimensions[1])
+                .add("boatsCount", properties.boatscount)
+                .add("schoonersCount", properties.schoonersCount)
+                .add("destroyersCount", properties.destroyersCount)
+                .add("carriersCount", properties.carriersCount)
+                .add("gameId", gameId)
+                .build();
+        return obj;
     }
     
     private final GameManager manager = GameManager.INSTANCE;
