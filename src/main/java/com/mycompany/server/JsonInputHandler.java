@@ -2,6 +2,8 @@ package com.mycompany.server;
 
 import javax.json.JsonObject;
 
+import com.mycompany.server.game.Directions;
+
 public class JsonInputHandler implements InputHander<JsonObject> {
 
     @Override
@@ -11,6 +13,11 @@ public class JsonInputHandler implements InputHander<JsonObject> {
         coordinates[0] = source.getInt("x");
         coordinates[1] = source.getInt("y");
         return coordinates;
+    }
+
+    @Override
+    public Directions getDirection(JsonObject source) {
+        return Directions.parseString(source.getString("direction"));
     }
 
 }

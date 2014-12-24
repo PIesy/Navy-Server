@@ -11,7 +11,6 @@ import javax.servlet.http.HttpSession;
 import javax.json.*;
 
 import com.mycompany.server.exceptions.NotFoundException;
-import com.mycompany.server.game.GameRules;
  
 @WebServlet("/Game")
 public class GameServlet extends HttpServlet
@@ -21,18 +20,19 @@ public class GameServlet extends HttpServlet
     {
         JsonObject obj;
         HttpSession session = request.getSession(true);
-        int gameId;
+        Game game;
         
         setResponseProperties(response);
-        if(session.getAttribute("game") == null){
-            session.setAttribute("game", manager.getGame().getId());
-        }
-        gameId = (int)session.getAttribute("game");
         try {
-            obj = fillGameData(gameId, manager.findGame(gameId).getRules());
+            if(session.getAttribute("game") == null)
+                throw new NotFoundException();
+            game = manager.findGame((int)session.getAttribute("game"));
         } catch (NotFoundException e) {
-            obj = Json.createObjectBuilder().build();
+            game = manager.getGame();
+            session.setAttribute("game", game.getId());
         }
+        obj = game.fillGameData();
+  
         response.getWriter().print(obj.toString());
     }
     
@@ -40,16 +40,10 @@ public class GameServlet extends HttpServlet
     {
         JsonObject object = (new JsonBuilder()).getJsonObject(request);
         JsonObject responceObject;
-        int[] coordinates;
         Game game;
         try {
-            getGameIfExists(request.getSession(), object);
-            game = manager.findGame(object.getInt("gameId"));
-            coordinates = game.handleInput(object);
-            responceObject = Json.createObjectBuilder()
-                    .add("x", coordinates[0])
-                    .add("y", coordinates[1])
-                    .build();
+            game = getGameIfExists(request.getSession(), object);
+            responceObject = game.parseRequest(object);
         } catch (NotFoundException e) {
             responceObject = Json.createObjectBuilder().add("error", e.toString()).build();
         }
@@ -57,7 +51,7 @@ public class GameServlet extends HttpServlet
         response.getWriter().println(responceObject.toString());
     }
     
-    private void getGameIfExists(HttpSession session, JsonObject object) throws NotFoundException
+    private Game getGameIfExists(HttpSession session, JsonObject object) throws NotFoundException
     {
         Game game;
         if(object.containsKey("gameId"))
@@ -68,6 +62,7 @@ public class GameServlet extends HttpServlet
         else {
             throw new NotFoundException("No game id provided");
         }
+        return game;
     }
     
     private void setResponseProperties(HttpServletResponse response)
@@ -76,21 +71,7 @@ public class GameServlet extends HttpServlet
         response.setCharacterEncoding("UTF8");
         response.setStatus(HttpServletResponse.SC_OK);
     }
-    
-    private JsonObject fillGameData(int gameId, GameRules properties)
-    {
-        JsonObject obj = Json.createObjectBuilder().add("gameId", gameId)
-                .add("size_x", properties.fieldDimensions[0])
-                .add("size_y", properties.fieldDimensions[1])
-                .add("boatsCount", properties.boatscount)
-                .add("schoonersCount", properties.schoonersCount)
-                .add("destroyersCount", properties.destroyersCount)
-                .add("carriersCount", properties.carriersCount)
-                .add("gameId", gameId)
-                .build();
-        return obj;
-    }
-    
+     
     private final GameManager manager = GameManager.INSTANCE;
     private static final long serialVersionUID = 6191308373440549493L;
 }

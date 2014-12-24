@@ -1,5 +1,7 @@
 package com.mycompany.server.game;
 
+import java.util.LinkedList;
+
 import com.mycompany.server.game.Grid;
 import com.mycompany.server.game.exceptions.AllShipsSetException;
 import com.mycompany.server.game.exceptions.GameOverException;
@@ -9,10 +11,11 @@ import com.mycompany.server.game.ships.ShipBuilder.ShipType;
 
 public class Player 
 {
-	public Player(Grid field)
+	public Player(Grid field, GameRules rules)
 	{
 		this.field = field;
-		initShips();
+		initRules(rules);
+		buildShips();
 	}
 	
 	public void setName(String name)
@@ -36,7 +39,7 @@ public class Player
 			throw new AllShipsSetException();
 		}
 		unsetShipCount--;
-		return ships[unsetShipCount];
+		return ships.pollLast();
 	}
 	
 	public void unsetShip()
@@ -52,25 +55,62 @@ public class Player
 		}
 	}
 	
-	private void initShips()
+	private void initRules(GameRules rules)
 	{
-		int i;
-		for(i = 0; i < 4; i++){
-			ships[i] = ShipBuilder.buildShip(ShipType.Boat);
-		}
-		for(i = 4; i < 7; i++){
-			ships[i] = ShipBuilder.buildShip(ShipType.Schooner);
-		}
-		for(i = 7; i < 9; i++){
-			ships[i] = ShipBuilder.buildShip(ShipType.Destroyer);
-		}
-		ships[i] = ShipBuilder.buildShip(ShipType.Carrier);
+	    carriersCount = rules.carriersCount;
+	    destroyersCount = rules.destroyersCount;
+	    schoonersCount = rules.schoonersCount;
+	    boatsCount = rules.boatscount;
+	    unsetShipCount += rules.carriersCount
+	            + rules.destroyersCount
+	            + rules.schoonersCount
+	            + rules.boatscount;
+	    remainingShips = unsetShipCount;
 	}
 	
-	private final static int SHIP_COUNT = 10;
-	private Ship[] ships = new Ship[SHIP_COUNT];
-	private int unsetShipCount = SHIP_COUNT;
-	private int remainingShips = SHIP_COUNT;
+	private void buildShips()
+    {
+        buildBoats();
+        buildSchooners();
+        buildDestroyers();
+        buildCarriers();
+    }
+    
+    private void buildBoats()
+    {
+        for(int i = 0; i < boatsCount; i++){
+            ships.add(ShipBuilder.buildShip(ShipType.Boat));
+        }
+    }
+    
+    private void buildSchooners()
+    {
+        for(int i = 0; i < schoonersCount; i++){
+            ships.add(ShipBuilder.buildShip(ShipType.Schooner));
+        }
+    }
+    
+    private void buildDestroyers()
+    {
+        for(int i = 0; i < destroyersCount; i++){
+            ships.add(ShipBuilder.buildShip(ShipType.Destroyer));
+        }
+    }
+    
+    private void buildCarriers()
+    {
+        for(int i = 0; i < carriersCount; i++){
+            ships.add(ShipBuilder.buildShip(ShipType.Carrier));
+        }
+    }
+
+    private LinkedList<Ship> ships = new LinkedList<>();
+    private int carriersCount;
+    private int destroyersCount;
+    private int schoonersCount;
+    private int boatsCount;
+	private int unsetShipCount = 0;
+	private int remainingShips = 0;
 	private String name = "";
 	private Grid field;
 }

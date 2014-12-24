@@ -13,5 +13,20 @@ public enum Directions {
 		return offset;
 	}
 	
+	public static Directions parseString(String str)
+	{
+	    switch(str.toLowerCase()){
+	    case "north":
+	        return North;
+	    case "south":
+	        return South;
+	    case "east":
+	        return East;
+	    case "west":
+	        return West;
+	    }
+	    return null;
+	}
+	
 	private int[] offset = {0,0};
 }
