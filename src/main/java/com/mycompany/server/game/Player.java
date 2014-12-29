@@ -39,12 +39,18 @@ public class Player
 			throw new AllShipsSetException();
 		}
 		unsetShipCount--;
-		return ships.pollLast();
+		lastSetShip = ships.pollLast();
+		return lastSetShip;
 	}
 	
 	public void unsetShip()
 	{
-		unsetShipCount++;
+	    if(lastSetShip != null)
+	    {
+	        ships.addLast(lastSetShip);
+	        lastSetShip = null;
+	        unsetShipCount++;
+	    }
 	}
 	
 	public void destroyShip() throws GameOverException
@@ -75,7 +81,7 @@ public class Player
         buildDestroyers();
         buildCarriers();
     }
-    
+
     private void buildBoats()
     {
         for(int i = 0; i < boatsCount; i++){
@@ -104,13 +110,14 @@ public class Player
         }
     }
 
-    private LinkedList<Ship> ships = new LinkedList<>();
-    private int carriersCount;
-    private int destroyersCount;
-    private int schoonersCount;
-    private int boatsCount;
-	private int unsetShipCount = 0;
-	private int remainingShips = 0;
-	private String name = "";
-	private Grid field;
+    protected Ship lastSetShip = null;
+    protected LinkedList<Ship> ships = new LinkedList<>();
+    protected int carriersCount;
+    protected int destroyersCount;
+    protected int schoonersCount;
+    protected int boatsCount;
+    protected int unsetShipCount = 0;
+    protected int remainingShips = 0;
+    protected String name = "";
+    protected Grid field;
 }

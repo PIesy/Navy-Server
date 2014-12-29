@@ -21,6 +21,13 @@ public class GridItem {
 		}
 		return false;
 	}
+	
+	public boolean tryToHit()
+	{
+	    if(hit)
+	        return false;
+	    return true;
+	}
     
 	public boolean isHit()
 	{

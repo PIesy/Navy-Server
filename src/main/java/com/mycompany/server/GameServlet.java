@@ -45,7 +45,7 @@ public class GameServlet extends HttpServlet
             game = getGameIfExists(request.getSession(), object);
             responceObject = game.parseRequest(object);
         } catch (NotFoundException e) {
-            responceObject = Json.createObjectBuilder().add("error", e.toString()).build();
+            responceObject = Json.createObjectBuilder().add("error", e.getMessage()).build();
         }
         setResponseProperties(response);
         response.getWriter().println(responceObject.toString());

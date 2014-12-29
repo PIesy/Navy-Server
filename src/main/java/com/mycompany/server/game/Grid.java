@@ -41,6 +41,11 @@ public class Grid {
 		return grid[y][x].hit();
 	}
 	
+	public boolean tryToHit(int x, int y)
+	{
+	    return grid[y][x].tryToHit();
+	}
+	
 	public int[] getSize()
 	{
 		return dimensions;
@@ -54,6 +59,31 @@ public class Grid {
 	public int getSizeVertical()
 	{
 		return dimensions[1];
+	}
+	
+	public boolean tryToSetShip(Ship ship, int x, int y, Directions direction)
+	{
+	    int[] offset = direction.convertTo2DOffset();
+        int[] startCoordinates = {x, y};
+        int[] endCoordinates = new int[2];
+        int[] temp;
+        
+        for(int i = 0; i < 2; i++){
+            endCoordinates[i] = startCoordinates[i] + offset[i] * (ship.getSize() - 1);
+        }
+        if((offset[0] < 0) || (offset[1] < 0))
+        {
+            temp = startCoordinates;
+            startCoordinates = endCoordinates;
+            endCoordinates = temp;
+        }
+        if(isOutOfBounds(startCoordinates) || isOutOfBounds(endCoordinates)){
+            return false;
+        }
+        if(isNearExistingShip(startCoordinates, endCoordinates)){
+            return false;
+        }
+        return true;
 	}
 	
 	public void setShip(Ship ship, int x, int y, Directions direction) throws IndexOutOfBoundsException

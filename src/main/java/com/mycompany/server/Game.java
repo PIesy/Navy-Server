@@ -1,13 +1,11 @@
 package com.mycompany.server;
 
 import javax.json.Json;
-import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 
+import com.mycompany.server.game.Bot;
 import com.mycompany.server.game.Directions;
 import com.mycompany.server.game.Grid;
-import com.mycompany.server.game.GridItemDescriptor;
 import com.mycompany.server.game.Player;
 import com.mycompany.server.game.GameRules;
 import com.mycompany.server.game.exceptions.AllShipsSetException;
@@ -29,7 +27,7 @@ public class Game {
         this.gameRules = rules;
         fields[0] = new Grid(gameRules.fieldDimensions[0], gameRules.fieldDimensions[1]);
         fields[1] = new Grid(gameRules.fieldDimensions[0], gameRules.fieldDimensions[1]);
-        bot = new Player(fields[1], gameRules);
+        bot = new Bot(fields[1], gameRules);
         player = new Player(fields[0], gameRules);
         initBot();
     }
@@ -82,98 +80,70 @@ public class Game {
     
     private JsonObject hit(JsonObject data)
     {
-        JsonObject response;
         int[] coordinates = inputHandler.getCoordinates(data);
-        JsonObjectBuilder builder = Json.createObjectBuilder();
+        boolean switchTurn = false;
         
         try {
-            fields[1].hit(coordinates[0], coordinates[1]);
-            builder.add("state", "success");
-            addField(builder);
-            response = builder.build();
+            switchTurn = !fields[1].hit(coordinates[0], coordinates[1]);
         } catch (AlreadyHitException e) {
-            response = Json.createObjectBuilder().add("error", "already hit this node").build();
+            return responseBuilder.errorResponse("Already hit this node");
         } catch (ShipIsKilledException e) {
             try {
                 bot.destroyShip();
-                builder.add("state", "success");
-                addField(builder);
-                response = builder.build();
             } catch (GameOverException e1) {
-                response = Json.createObjectBuilder().add("gameEnd", "YOU ARE WICTORIOUS!").build();
+                return responseBuilder.victoryResponse();
             }
         }
-        return response;
+        if(switchTurn){
+            return botHit();
+        }
+        return responseBuilder.successWithBothFieldsResponse(fields[0].getState(), fields[1].getState(), gameRules.fieldDimensions);
     }
     
     private JsonObject setShip(JsonObject data)
     {
-        JsonObject response;
         int[] coordinates = inputHandler.getCoordinates(data);
         Directions direction = inputHandler.getDirection(data);
-        JsonObjectBuilder builder = Json.createObjectBuilder();
         
         Ship ship;
         try {
             ship = player.setShip();
             fields[0].setShip(ship, coordinates[0], coordinates[1], direction);
-            builder.add("state", "success");
-            addField(builder);
-            response = builder.build();
         } catch (AllShipsSetException e) {
-            response = Json.createObjectBuilder().add("state", "allSet").build();
         } catch (IndexOutOfBoundsException e) {
-            response = Json.createObjectBuilder().add("error", e.toString()).build();
+            player.unsetShip();
+            return responseBuilder.errorWithFieldResponse(e.getMessage(), fields[0].getState(), gameRules.fieldDimensions);
         }
-        return response;
+        return responseBuilder.successWithFieldResponse(fields[0].getState(), gameRules.fieldDimensions);
     }
-    
+      
     private void initBot()
     {
-        Ship ship;
-        
-        try {
-            ship = bot.setShip();
-            fields[1].setShip(ship, 0, 0, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 6, 0, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 0, 2, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 6, 2, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 0, 4, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 6, 4, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 0, 6, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 6, 6, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 0, 8, Directions.East);
-            ship = bot.setShip();
-            fields[1].setShip(ship, 8, 8, Directions.East);
-        } catch (AllShipsSetException e){}
+        bot.setShips();
     }
     
-    private void addField(JsonObjectBuilder builder)
+    private JsonObject botHit()
     {
-        JsonArrayBuilder rowBuilder = Json.createArrayBuilder();
-        GridItemDescriptor[][] field = fields[0].getState();
+        boolean end = false;
         
-        for(int i = 0; i < gameRules.fieldDimensions[1]; i++) {
-            JsonArrayBuilder columnBuilder = Json.createArrayBuilder();
-            for (int j = 0; j < gameRules.fieldDimensions[0]; j++) {
-                columnBuilder.add(field[i][j].toInt());
+        while(!end){
+            try {
+                end = !bot.hit(fields[0]); 
+            } catch (ShipIsKilledException e) {
+                try {
+                    player.destroyShip();
+                } catch (GameOverException e1) {
+                    return responseBuilder.defeatResponse();
+                }
             }
-            rowBuilder.add(columnBuilder);
         }
-        builder.add("field", rowBuilder.build());
+        return responseBuilder.successWithBothFieldsResponse(fields[0].getState(), fields[1].getState(), gameRules.fieldDimensions);
     }
-     
+    
+    private final JsonResponseBuilder responseBuilder = new JsonResponseBuilder();
     private final Grid[] fields = new Grid[2];
     private final Player player;
-    private final Player bot;
+    private final Bot bot;
     private final GameRules gameRules;
     private final InputHander<JsonObject> inputHandler = new JsonInputHandler(); 
     private final int id;
