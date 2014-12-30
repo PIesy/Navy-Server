@@ -18,7 +18,7 @@ public class Game {
 
     public Game()
     {
-        this(-1, new GameRules());
+        this(-1, new GameRules(-1));
     }
     
     public Game(int id, GameRules rules)
@@ -31,20 +31,7 @@ public class Game {
         player = new Player(fields[0], gameRules);
         initBot();
     }
-    
-    public JsonObject parseRequest(JsonObject request)
-    {
-        switch(request.getString("type")){
-        case "setName": 
-            return setPlayerName(request);
-        case "hit":
-            return hit(request);
-        case "setShip":
-            return setShip(request);
-        }
-        return Json.createObjectBuilder().add("state", "Wup^_^Wup").build();
-    }
-    
+        
     public int getId()
     {
         return id;
@@ -60,7 +47,7 @@ public class Game {
         JsonObject obj = Json.createObjectBuilder()
                 .add("size_x", gameRules.fieldDimensions[0])
                 .add("size_y", gameRules.fieldDimensions[1])
-                .add("boatsCount", gameRules.boatscount)
+                .add("boatsCount", gameRules.boatsCount)
                 .add("schoonersCount", gameRules.schoonersCount)
                 .add("destroyersCount", gameRules.destroyersCount)
                 .add("carriersCount", gameRules.carriersCount)
@@ -69,42 +56,36 @@ public class Game {
         return obj;
     }
     
-    private JsonObject setPlayerName(JsonObject data)
+    public GameResponse setPlayerName(String name)
     {
-        JsonObject response = Json.createObjectBuilder()
-                .add("state", "success").build();
-        player.setName(data.getString("name"));
-        return response;
-        
+        GameResponse response = GameResponseFactory.makeSuccessResponse();
+        player.setName(name);
+        return response;   
     }
     
-    private JsonObject hit(JsonObject data)
+    public GameResponse hit(int[] coordinates)
     {
-        int[] coordinates = inputHandler.getCoordinates(data);
         boolean switchTurn = false;
         
         try {
             switchTurn = !fields[1].hit(coordinates[0], coordinates[1]);
         } catch (AlreadyHitException e) {
-            return responseBuilder.errorResponse("Already hit this node");
+            return GameResponseFactory.makeErrorResponse(e.getMessage());
         } catch (ShipIsKilledException e) {
             try {
                 bot.destroyShip();
             } catch (GameOverException e1) {
-                return responseBuilder.victoryResponse();
+                return GameResponseFactory.makeEndGameResponse("YOU ARE VICTORIOUS!");
             }
         }
         if(switchTurn){
             return botHit();
         }
-        return responseBuilder.successWithBothFieldsResponse(fields[0].getState(), fields[1].getState(), gameRules.fieldDimensions);
+        return GameResponseFactory.makeSuccessWithBothFieldsResponse(fields[0], fields[1]);
     }
     
-    private JsonObject setShip(JsonObject data)
-    {
-        int[] coordinates = inputHandler.getCoordinates(data);
-        Directions direction = inputHandler.getDirection(data);
-        
+    public GameResponse setShip(int[] coordinates, Directions direction)
+    {  
         Ship ship;
         try {
             ship = player.setShip();
@@ -112,9 +93,9 @@ public class Game {
         } catch (AllShipsSetException e) {
         } catch (IndexOutOfBoundsException e) {
             player.unsetShip();
-            return responseBuilder.errorWithFieldResponse(e.getMessage(), fields[0].getState(), gameRules.fieldDimensions);
+            return GameResponseFactory.makeErrorResponse(e.getMessage());
         }
-        return responseBuilder.successWithFieldResponse(fields[0].getState(), gameRules.fieldDimensions);
+        return GameResponseFactory.makeSuccessWithFieldResponse(fields[0]);
     }
       
     private void initBot()
@@ -122,7 +103,7 @@ public class Game {
         bot.setShips();
     }
     
-    private JsonObject botHit()
+    private GameResponse botHit()
     {
         boolean end = false;
         
@@ -133,18 +114,16 @@ public class Game {
                 try {
                     player.destroyShip();
                 } catch (GameOverException e1) {
-                    return responseBuilder.defeatResponse();
+                    return GameResponseFactory.makeEndGameResponse("NOT SO EASY!");
                 }
             }
         }
-        return responseBuilder.successWithBothFieldsResponse(fields[0].getState(), fields[1].getState(), gameRules.fieldDimensions);
+        return GameResponseFactory.makeSuccessWithBothFieldsResponse(fields[0], fields[1]);
     }
     
-    private final JsonResponseBuilder responseBuilder = new JsonResponseBuilder();
     private final Grid[] fields = new Grid[2];
     private final Player player;
     private final Bot bot;
     private final GameRules gameRules;
-    private final InputHander<JsonObject> inputHandler = new JsonInputHandler(); 
     private final int id;
 }

@@ -1,6 +1,6 @@
 package com.mycompany.server;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.mycompany.server.Game;
 import com.mycompany.server.exceptions.NotFoundException;
@@ -23,9 +23,9 @@ public enum GameManager {
         return result;
     }
     
-    public Game getGame()
+    public synchronized Game newGame()
     {
-        Game result = new Game(generatedId, new GameRules());
+        Game result = new Game(generatedId, new GameRules(generatedId));
         
         games.put(generatedId, result);
         generatedId++;
@@ -48,5 +48,5 @@ public enum GameManager {
     }
     
     private int generatedId = 0;
-    private HashMap<Integer, Game> games = new HashMap<>();
+    private ConcurrentHashMap<Integer, Game> games = new ConcurrentHashMap<>();
 }

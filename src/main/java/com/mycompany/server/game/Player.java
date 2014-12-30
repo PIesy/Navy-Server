@@ -66,11 +66,11 @@ public class Player
 	    carriersCount = rules.carriersCount;
 	    destroyersCount = rules.destroyersCount;
 	    schoonersCount = rules.schoonersCount;
-	    boatsCount = rules.boatscount;
+	    boatsCount = rules.boatsCount;
 	    unsetShipCount += rules.carriersCount
 	            + rules.destroyersCount
 	            + rules.schoonersCount
-	            + rules.boatscount;
+	            + rules.boatsCount;
 	    remainingShips = unsetShipCount;
 	}
 	

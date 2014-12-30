@@ -27,12 +27,13 @@ public class Grid {
 	public GridItemDescriptor[][] getState()
 	{
 		GridItemDescriptor[][] states = new GridItemDescriptor[dimensions[1]][dimensions[0]];
-		for(int i = 0; i < dimensions[1]; i++)
+		for(int i = 0; i < dimensions[1]; i++){
 			for (int j = 0; j < dimensions[0]; j++)
 			{
 				states[i][j] = new GridItemDescriptor();
 				states[i][j].initialize(grid[i][j]);
 			}
+		}
 		return states;
 	}
 
@@ -113,9 +114,11 @@ public class Grid {
 	
 	public boolean isOutOfBounds(int[] coordinates)
 	{
-		for(int i = 0; i < 2; i++)
-			if((coordinates[i] < 0) || (coordinates[i] > dimensions[i] - 1))
+		for(int i = 0; i < 2; i++){
+			if((coordinates[i] < 0) || (coordinates[i] > dimensions[i] - 1)){
 				return true;
+			}
+		}
 		return false;
 	}
 	
