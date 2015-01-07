@@ -3,7 +3,6 @@ package com.mycompany.server;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.mycompany.data.game.GameRules;
-import com.mycompany.server.Game;
 import com.mycompany.server.exceptions.NotFoundException;
 
 public enum GameManager
@@ -15,18 +14,18 @@ public enum GameManager
         return INSTANCE;
     }
 
-    public Game findGame(int id) throws NotFoundException
+    public WebGame findGame(int id) throws NotFoundException
     {
-        Game result = games.get(id);
+        WebGame result = games.get(id);
 
         if (result == null)
             throw new NotFoundException("Requested game doesn't exist");
         return result;
     }
 
-    public synchronized Game newGame()
+    public synchronized WebGame newGame()
     {
-        Game result = new Game(generatedId, new GameRules(generatedId));
+        WebGame result = new WebGame(generatedId, new GameRules(generatedId));
 
         games.put(generatedId, result);
         generatedId++;
@@ -38,9 +37,9 @@ public enum GameManager
         games.remove(id);
     }
 
-    public Game[] getAllGames()
+    public WebGame[] getAllGames()
     {
-        return games.values().toArray(new Game[0]);
+        return games.values().toArray(new WebGame[0]);
     }
 
     public int getGamesCount()
@@ -49,5 +48,5 @@ public enum GameManager
     }
 
     private int generatedId = 0;
-    private ConcurrentHashMap<Integer, Game> games = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, WebGame> games = new ConcurrentHashMap<>();
 }
