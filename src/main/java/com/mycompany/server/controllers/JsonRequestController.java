@@ -18,7 +18,8 @@ import com.mycompany.server.actions.json.JsonRequestSetName;
 import com.mycompany.server.actions.json.JsonRequestSetShip;
 import com.mycompany.server.exceptions.NotFoundException;
 
-public class JsonRequestController implements RequestController {
+public class JsonRequestController implements RequestController
+{
 
     public JsonRequestController()
     {
@@ -27,21 +28,21 @@ public class JsonRequestController implements RequestController {
         actions.put("hit", new JsonRequestHit());
         actions.put("getInfo", new JsonRequestGetInfo());
     }
-    
+
     @Override
-    public void getInfo(HttpServletResponse response, int gameId) 
+    public void getInfo(HttpServletResponse response, int gameId)
     {
         Game game;
         JsonObject data;
         try {
             game = GameManager.INSTANCE.findGame(gameId);
             data = actions.get("getInfo").execute(null, game);
-        } catch(Exception e) {
+        } catch (Exception e) {
             data = Json.createObjectBuilder().add("state", "error").add("error", e.getMessage()).build();
         }
         writeResponse(response, data);
     }
-    
+
     public void parseRequest(HttpServletResponse response, HttpServletRequest request)
     {
         JsonObject data = (new JsonBuilder()).getJsonObject(request);
@@ -53,7 +54,7 @@ public class JsonRequestController implements RequestController {
         }
         writeResponse(response, data);
     }
-    
+
     private Game getGameIfExists(HttpServletRequest request, JsonObject data) throws NotFoundException
     {
         Game game;
@@ -65,7 +66,7 @@ public class JsonRequestController implements RequestController {
         }
         return game;
     }
-    
+
     private void writeResponse(HttpServletResponse response, JsonObject data)
     {
         setResponseProperties(response);
@@ -75,13 +76,13 @@ public class JsonRequestController implements RequestController {
             e.printStackTrace();
         }
     }
-    
+
     private void setResponseProperties(HttpServletResponse response)
     {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF8");
         response.setStatus(HttpServletResponse.SC_OK);
     }
-    
+
     private HashMap<String, JsonRequestAction> actions = new HashMap<>();
 }

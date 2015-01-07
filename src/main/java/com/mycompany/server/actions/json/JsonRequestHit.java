@@ -5,20 +5,19 @@ import javax.json.JsonObject;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mycompany.data.game.GameResponse;
 import com.mycompany.server.Game;
-import com.mycompany.server.GameResponse;
 import com.mycompany.server.JsonBuilder;
 import com.mycompany.server.JsonInputHandler;
 
-
-public class JsonRequestHit implements JsonRequestAction 
+public class JsonRequestHit implements JsonRequestAction
 {
 
-    public JsonRequestHit() 
+    public JsonRequestHit()
     {
         mapper.setSerializationInclusion(Include.NON_EMPTY);
     }
-    
+
     @Override
     public JsonObject execute(JsonObject data, Game game)
     {

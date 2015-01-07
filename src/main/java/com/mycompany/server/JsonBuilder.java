@@ -8,23 +8,26 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.http.HttpServletRequest;
 
-public class JsonBuilder {
+public class JsonBuilder
+{
 
     public JsonObject getJsonObject(HttpServletRequest request)
     {
-        JsonObject object;   
+        JsonObject object;
         StringBuffer jb = new StringBuffer();
         String line = null;
         try {
             BufferedReader reader = request.getReader();
-            while ((line = reader.readLine()) != null)
+            while ((line = reader.readLine()) != null) {
                 jb.append(line);
-        } catch (Exception e) {}
-        
+            }
+        } catch (Exception e) {
+        }
+
         object = getJsonObject(jb.toString());
         return object;
     }
-    
+
     public JsonObject getJsonObject(String string)
     {
         JsonObject object;

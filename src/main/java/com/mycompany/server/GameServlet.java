@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 import com.mycompany.server.controllers.JsonRequestController;
 import com.mycompany.server.controllers.RequestController;
 import com.mycompany.server.exceptions.NotFoundException;
- 
+
 @WebServlet("/Game")
 public class GameServlet extends HttpServlet
 {
@@ -27,37 +27,37 @@ public class GameServlet extends HttpServlet
     {
         HttpSession session = request.getSession(true);
         Game game;
-        
+
         try {
-            if(session.getAttribute("game") == null)
+            if (session.getAttribute("game") == null)
                 throw new NotFoundException();
-            game = manager.findGame((int)session.getAttribute("game"));
+            game = manager.findGame((int) session.getAttribute("game"));
         } catch (NotFoundException e) {
             game = manager.newGame();
             session.setAttribute("game", game.getId());
         }
-        try{
+        try {
             controllers.get(request.getHeader("Accept")).getInfo(response, game.getId());
-        } catch(Exception e) {
+        } catch (Exception e) {
             setResponseError(response);
         }
     }
-    
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         String contentType = request.getContentType().split(";")[0];
-        try{
+        try {
             controllers.get(contentType).parseRequest(response, request);
-        } catch(Exception e) {
+        } catch (Exception e) {
             setResponseError(response);
         }
     }
-    
+
     private void setResponseError(HttpServletResponse response)
     {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
-    
+
     private HashMap<String, RequestController> controllers = new HashMap<>();
     private final GameManager manager = GameManager.INSTANCE;
     private static final long serialVersionUID = 6191308373440549493L;

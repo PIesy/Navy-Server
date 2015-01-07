@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.json.*;
- 
+
 @WebServlet("/Admin")
 public class AdminServlet extends HttpServlet
 {
@@ -20,7 +20,7 @@ public class AdminServlet extends HttpServlet
         response.getWriter().println("session=" + request.getSession(true).getId());
         response.getWriter().println("Games count " + manager.getGamesCount());
     }
-    
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         JsonObject object = (new JsonBuilder()).getJsonObject(request);
@@ -29,7 +29,7 @@ public class AdminServlet extends HttpServlet
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().println(object.toString());
     }
-    
+
     private final GameManager manager = GameManager.INSTANCE;
     private static final long serialVersionUID = -2652099533020368688L;
 }
