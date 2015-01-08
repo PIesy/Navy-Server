@@ -12,6 +12,7 @@ import com.mycompany.data.ContentMapperFactory;
 import com.mycompany.data.ContentMapperFactory.MapperType;
 import com.mycompany.data.GameResponseFactory;
 import com.mycompany.data.game.GameRequest;
+import com.mycompany.data.game.GameRequest.GameRequestType;
 import com.mycompany.data.game.GameResponse;
 import com.mycompany.server.GameManager;
 import com.mycompany.server.WebGame;
@@ -27,10 +28,10 @@ public class RequestController
 
     public RequestController()
     {
-        actions.put("setShip", new RequestSetShip());
-        actions.put("setName", new RequestSetName());
-        actions.put("hit", new RequestHit());
-        actions.put("getInfo", new RequestGetInfo());
+        actions.put(GameRequestType.SetShip, new RequestSetShip());
+        actions.put(GameRequestType.SetName, new RequestSetName());
+        actions.put(GameRequestType.Hit, new RequestHit());
+        actions.put(GameRequestType.GetInfo, new RequestGetInfo());
     }
 
     public void getInfo(HttpServletResponse response, int gameId, String contentType) throws Exception
@@ -41,7 +42,7 @@ public class RequestController
         
         try {
             game = GameManager.INSTANCE.findGame(gameId);
-            data = actions.get("getInfo").execute(null, game, mapper);
+            data = actions.get(GameRequestType.GetInfo).execute(null, game, mapper);
         } catch (Exception e) {
             data = mapper.serialize(GameResponseFactory.makeErrorResponse(e.getMessage()), GameResponse.class);
         }
@@ -107,5 +108,5 @@ public class RequestController
         return jb.toString();
     }
 
-    private HashMap<String, RequestAction> actions = new HashMap<>();
+    private HashMap<GameRequestType, RequestAction> actions = new HashMap<>();
 }
