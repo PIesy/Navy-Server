@@ -3,12 +3,13 @@ package com.mycompany.server;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DatabaseHandler
+public class MySQLDatabaseHandler
 {
     
-    public DatabaseHandler()
+    public MySQLDatabaseHandler()
     {
         try {
             Class.forName(jdbcDriver);
@@ -28,26 +29,59 @@ public class DatabaseHandler
             statement = connection.prepareStatement(preparedStatement);
             fillParameters(statement, parameters);
             statement.executeUpdate();
-        } catch(SQLException e){
-            e.printStackTrace();
-        } finally {
-            try {
-                if(statement != null) {
-                    statement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+        } catch(SQLException e){} 
+        try {
+            if(statement != null) {
+                statement.close();
             }
-            closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        closeConnection();
     }
     
-    public Object read(int id)
+    public ResultSet read(String preparedStatement, Object... parameters)
     {
+        PreparedStatement statement = null;
+        
         if(!isDriverRegistered) {
             return null;
         }
+        try {
+            openConnection();
+            statement = connection.prepareStatement(preparedStatement, 
+                    ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            fillParameters(statement, parameters);
+            return statement.executeQuery();
+        } catch(SQLException e) {} 
+        try {
+            if(statement != null) {
+                statement.close();
+            }
+        } catch (SQLException e) {}
+        closeConnection();
         return null;
+    }
+    
+    public void delete(String preparedStatement, Object... parameters)
+    {
+        PreparedStatement statement = null;
+        
+        if(!isDriverRegistered) {
+            return;
+        }
+        try {
+            openConnection();
+            statement = connection.prepareStatement(preparedStatement);
+            fillParameters(statement, parameters);
+            statement.execute();
+        } catch(SQLException e) {} 
+        try {
+            if(statement != null) {
+                statement.close();
+            }
+        } catch (SQLException e) {}
+        closeConnection();
     }
      
     private void fillParameters(PreparedStatement statement, Object... parameters) throws SQLException

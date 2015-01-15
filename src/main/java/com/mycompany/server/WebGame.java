@@ -39,8 +39,6 @@ public class WebGame extends Game
         result.playerNames[0] = response.getPlayer1Name();
         result.playerNames[1] = response.getPlayer2Name();
         result.id = id;
-        result.shipsCount[0] = player.getRemainingShipsCount();
-        result.shipsCount[1] = bot.getRemainingShipsCount();
         return result;
     }
 
