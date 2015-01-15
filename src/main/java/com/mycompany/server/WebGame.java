@@ -15,7 +15,12 @@ public class WebGame extends Game
 
     public WebGame(int id, GameRules rules)
     {
-        super(rules);
+        this(id, rules, true);
+    }
+    
+    public WebGame(int id, GameRules rules, boolean initBot)
+    {
+        super(rules, initBot);
         this.id = id;
         this.gameRules = rules;
     }

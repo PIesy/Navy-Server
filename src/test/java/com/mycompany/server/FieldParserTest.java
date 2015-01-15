@@ -1,13 +1,10 @@
 package com.mycompany.server;
 
-import java.util.Arrays;
-
 import com.mycompany.data.exceptions.ShipIsKilledException;
 import com.mycompany.data.game.Bot;
 import com.mycompany.data.game.GameRules;
 import com.mycompany.data.game.Grid;
 import com.mycompany.data.game.GridItemDescriptor;
-import com.mycompany.data.game.LocationData;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -29,9 +26,6 @@ public class FieldParserTest extends TestCase
     public void testFieldParser()
     {
         parser.parseField(getIntegerFieldDescriptor());
-        for(LocationData data: parser.getShipData()) {
-            System.out.println(data.direction + " " + Arrays.toString(data.coordinates) + " " + data.shipType);
-        }
         assertTrue(parser.getShipData().size() == (rules.getBoatsCount() + rules.getCarriersCount() + rules.getDestroyersCount() + rules.getSchoonersCount()));
     }
     

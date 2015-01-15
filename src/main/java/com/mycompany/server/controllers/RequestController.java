@@ -43,6 +43,7 @@ public class RequestController
         try {
             game = GameManager.INSTANCE.findGame(gameId);
             data = actions.get(GameRequestType.GetInfo).execute(null, game, mapper);
+            saveGame(game.getId());
         } catch (Exception e) {
             data = mapper.serialize(GameResponseFactory.makeErrorResponse(e.getMessage()), GameResponse.class);
         }
@@ -58,6 +59,7 @@ public class RequestController
         try {
             WebGame game = getGameIfExists(request, req);
             data = actions.get(req.getType()).execute(req, game, mapper);
+            saveGame(game.getId());
         } catch (Exception e) {
             data = mapper.serialize(GameResponseFactory.makeErrorResponse(e.getMessage()), GameResponse.class);
         }
@@ -71,6 +73,7 @@ public class RequestController
             game = GameManager.INSTANCE.findGame(data.getGameId());
             request.getSession(true).setAttribute("game", data.getGameId());
         } catch (NullPointerException e) {
+            e.printStackTrace();
             throw new NotFoundException("No game id specified");
         }
         return game;
@@ -106,6 +109,11 @@ public class RequestController
         }
 
         return jb.toString();
+    }
+    
+    private void saveGame(int gameId)
+    {
+        GameManager.INSTANCE.saveGame(gameId);
     }
 
     private HashMap<GameRequestType, RequestAction> actions = new HashMap<>();

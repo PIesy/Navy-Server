@@ -9,4 +9,5 @@ public interface DatabaseInterface
     void deleteAll();
     GameInfo readGame(int id) throws IOException;
     GameInfo[] readAll() throws IOException;
+    int getMaxID();
 }

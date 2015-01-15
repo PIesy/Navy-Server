@@ -65,15 +65,27 @@ public class SqlDatabaseInterface implements DatabaseInterface
         handler.delete(GAME_SQL_DELETE_STRING);
     }
     
+    @Override
+    public int getMaxID()
+    {
+        ResultSet data = handler.read(GAME_SQL_GET_LAST_ID_STRING);
+        int result = -1;
+        try {
+            data.next();
+            result = data.getInt("identifier");
+        } catch (SQLException e) {}
+        return result;
+    }
+    
     private GameInfo getInfoFromRow(ResultSet row) throws IOException
     {
         GameInfo result = new GameInfo();
         
         try {
-        result.playerNames[0] = row.getString("firstPlayerName");
-        result.playerNames[1] = row.getString("secondPlayerName");
-        result.player1Field = decodeFromBase64(row.getString("firstPlayerField"), new int[][]{});
-        result.player2Field = decodeFromBase64(row.getString("secondPlayerField"), new int[][]{});
+            result.playerNames[0] = row.getString("firstPlayerName");
+            result.playerNames[1] = row.getString("secondPlayerName");
+            result.player1Field = decodeFromBase64(row.getString("firstPlayerField"), new int[][]{});
+            result.player2Field = decodeFromBase64(row.getString("secondPlayerField"), new int[][]{});
         } catch(SQLException e){}
         return result;
     }
@@ -103,5 +115,6 @@ public class SqlDatabaseInterface implements DatabaseInterface
     private static final String GAME_SQL_READ_BY_ID_EXTENSION = "WHERE id = ?";
     private static final String GAME_SQL_DELETE_STRING = "DELETE FROM games ";
     private static final String GAME_SQL_DELETE_BY_ID_EXTENSION = "WHERE id = ?";
+    private static final String GAME_SQL_GET_LAST_ID_STRING = "SELECT MAX(id) as identifier FROM games";
     private MySQLDatabaseHandler handler = new MySQLDatabaseHandler();
 }

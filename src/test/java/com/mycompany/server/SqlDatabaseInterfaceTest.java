@@ -29,6 +29,7 @@ public class SqlDatabaseInterfaceTest extends TestCase
         handler.writeGame(infoSource);
         infoResult = handler.readGame(-1);
         handler.deleteGame(-1);
+        System.out.println(handler.getMaxID());
         assertTrue(Arrays.deepEquals(infoSource.player2Field, infoResult.player2Field));
     }
         
