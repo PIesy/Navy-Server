@@ -14,6 +14,16 @@ import org.apache.commons.codec.binary.Base64;
 
 public class SqlDatabaseInterface implements DatabaseInterface
 {
+    
+    @Override
+    public void updateGame(GameInfo info) throws IOException
+    {
+        String str1 = encodeInBase64(info.player1Field);
+        String str2 = encodeInBase64(info.player2Field);
+        
+        handler.write(GAME_SQL_UPDATE_STRING, str1, str2, info.id);
+    }
+    
     @Override
     public void writeGame(GameInfo info) throws IOException
     {
@@ -111,6 +121,8 @@ public class SqlDatabaseInterface implements DatabaseInterface
     private static final String GAME_SQL_WRITE_STRING  = "INSERT INTO games (id, firstPlayerName,"
             + " secondPlayerName, firstPlayerField, secondPlayerField)"
             + " VALUES (?, ?, ?, ?, ?)";
+    private static final String GAME_SQL_UPDATE_STRING = "UPDATE games SET firstPlayerField = ?"
+            + ", secondPlayerField = ? WHERE id = ?";
     private static final String GAME_SQL_READ_STRING = "SELECT * FROM games ";
     private static final String GAME_SQL_READ_BY_ID_EXTENSION = "WHERE id = ?";
     private static final String GAME_SQL_DELETE_STRING = "DELETE FROM games ";

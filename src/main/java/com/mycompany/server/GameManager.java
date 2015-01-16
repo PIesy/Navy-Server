@@ -27,24 +27,23 @@ public enum GameManager
         if (result == null) 
         {
             result = loader.loadGame(id);
-            games.put(id, result);
         }
         if (result == null) {
             throw new NotFoundException("Requested game doesn't exist");
         }
+        games.put(id, result);
         return result;
     }
     
     public void saveGame(int id)
     {
-        WebGame result = games.get(id);
+        WebGame game = games.get(id);
         
-        if(result == null) {
+        if(game == null) {
             return;
         }
         try {
-            database.deleteGame(id);
-            database.writeGame(result.getInfo());
+            database.updateGame(game.getInfo());
         } catch (IOException e) {}
     }
 

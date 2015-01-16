@@ -4,6 +4,7 @@ import java.io.IOException;
 
 public interface DatabaseInterface
 {
+    void updateGame(GameInfo info) throws IOException;
     void writeGame(GameInfo info) throws IOException;
     void deleteGame(int id);
     void deleteAll();
