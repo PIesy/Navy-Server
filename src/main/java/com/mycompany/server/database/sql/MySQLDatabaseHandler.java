@@ -1,4 +1,4 @@
-package com.mycompany.server;
+package com.mycompany.server.database.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,10 +20,10 @@ public class MySQLDatabaseHandler
     public void write(String preparedStatement, Object... parameters)
     {
         PreparedStatement statement = null;
+        
         if(!isDriverRegistered) {
             return;
-        }
-        
+        }  
         try {
             openConnection();
             statement = connection.prepareStatement(preparedStatement);

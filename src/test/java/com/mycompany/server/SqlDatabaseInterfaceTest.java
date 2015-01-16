@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import com.mycompany.data.game.GameRules;
+import com.mycompany.server.database.sql.SqlDatabaseInterface;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

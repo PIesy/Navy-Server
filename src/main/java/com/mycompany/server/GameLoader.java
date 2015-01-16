@@ -12,9 +12,16 @@ import com.mycompany.data.game.Grid;
 import com.mycompany.data.game.LocalPlayer;
 import com.mycompany.data.game.LocationData;
 import com.mycompany.data.game.ships.ShipBuilder;
+import com.mycompany.server.database.DatabaseInterface;
 
 public class GameLoader
 {
+    
+    public GameLoader(DatabaseInterface database)
+    {
+        this.database = database;
+    }
+    
     public WebGame loadGame(int id)
     {
         GameInfo info;
@@ -83,5 +90,5 @@ public class GameLoader
         }
     }
     
-    private final DatabaseInterface database = new SqlDatabaseInterface();
+    private final DatabaseInterface database;
 }

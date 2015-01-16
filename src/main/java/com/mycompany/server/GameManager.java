@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.mycompany.data.game.GameRules;
+import com.mycompany.server.database.DatabaseInterface;
+import com.mycompany.server.database.nosql.MongoDbDatabaseInterface;
 import com.mycompany.server.exceptions.NotFoundException;
 
 public enum GameManager
@@ -18,6 +20,7 @@ public enum GameManager
     private GameManager()
     {
         generatedId = database.getMaxID() + 1;
+        loader = new GameLoader(database);
     }
 
     public WebGame findGame(int id) throws NotFoundException
@@ -52,6 +55,9 @@ public enum GameManager
         WebGame result = new WebGame(generatedId, new GameRules(generatedId));
 
         games.put(generatedId, result);
+        try {
+            database.writeGame(result.getInfo());
+        } catch (IOException e) {}
         generatedId++;
         return result;
     }
@@ -71,8 +77,8 @@ public enum GameManager
         return games.size();
     }
     
-    private GameLoader loader = new GameLoader();
-    private DatabaseInterface database = new SqlDatabaseInterface();
+    private GameLoader loader;
+    private DatabaseInterface database = new MongoDbDatabaseInterface();
     private int generatedId = 0;
     private ConcurrentHashMap<Integer, WebGame> games = new ConcurrentHashMap<>();
 }

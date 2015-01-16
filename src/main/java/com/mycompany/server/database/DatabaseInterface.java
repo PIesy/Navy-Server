@@ -1,6 +1,8 @@
-package com.mycompany.server;
+package com.mycompany.server.database;
 
 import java.io.IOException;
+
+import com.mycompany.server.GameInfo;
 
 public interface DatabaseInterface
 {

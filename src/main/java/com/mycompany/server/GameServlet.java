@@ -34,7 +34,6 @@ public class GameServlet extends HttpServlet
         } catch (Exception e) {
             setResponseError(response);
         }
-        (new SqlDatabaseInterface()).writeGame(game.getInfo());
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException

@@ -1,4 +1,4 @@
-package com.mycompany.server;
+package com.mycompany.server.database.sql;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+
+import com.mycompany.server.GameInfo;
+import com.mycompany.server.database.DatabaseInterface;
 
 public class SqlDatabaseInterface implements DatabaseInterface
 {
