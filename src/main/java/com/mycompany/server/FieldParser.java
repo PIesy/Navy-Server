@@ -17,6 +17,7 @@ public class FieldParser
     
     public void parseField(int[][] field)
     {
+        clear();
         for(int i = 0; i < field.length; i++) {
             for(int j = 0; j < field[0].length; j++) 
             {
@@ -111,6 +112,12 @@ public class FieldParser
             return Directions.South;
         }
         return Directions.East;
+    }
+    
+    private void clear()
+    {
+        ships.clear();
+        shipsCoordinates.clear();
     }
     
     private List<List<int[]>> shipsCoordinates = new ArrayList<>();

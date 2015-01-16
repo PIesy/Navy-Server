@@ -24,7 +24,8 @@ public enum GameManager
     {
         WebGame result = games.get(id);
 
-        if (result == null) {
+        if (result == null) 
+        {
             result = loader.loadGame(id);
             games.put(id, result);
         }

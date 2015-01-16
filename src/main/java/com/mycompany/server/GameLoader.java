@@ -9,6 +9,7 @@ import com.mycompany.data.exceptions.ShipIsKilledException;
 import com.mycompany.data.game.Game;
 import com.mycompany.data.game.GameRules;
 import com.mycompany.data.game.Grid;
+import com.mycompany.data.game.LocalPlayer;
 import com.mycompany.data.game.LocationData;
 import com.mycompany.data.game.ships.ShipBuilder;
 
@@ -35,6 +36,7 @@ public class GameLoader
         FieldParser parser = new FieldParser( new int[]{info.player1Field.length, info.player2Field.length});
         WebGame game = new WebGame(id , new GameRules(id), false);
         
+        setNames(game, info);
         parser.parseField(info.player1Field);
         setShips(game, parser.getShipData(), 0);
         setHits(game, parser.getHitData(), 0);
@@ -44,10 +46,20 @@ public class GameLoader
         return game;
     }
     
+    private void setNames(Game game, GameInfo info)
+    {
+        for(int i = 0; i < 2; i++) {
+            game.getPlayer(0).setName(info.playerNames[0]);
+        }
+    }
+    
     private void setShips(Game game, List<LocationData> ships, int playerNum)
     {
         Grid grid = game.getPlayerGrid(playerNum);
+        LocalPlayer player = game.getPlayer(playerNum);
+        
         for(LocationData ship: ships) {
+            player.getShip();
             grid.setShip(ShipBuilder.buildShip(ship.shipType), ship.coordinates[0], ship.coordinates[1], ship.direction);
         }
     }
